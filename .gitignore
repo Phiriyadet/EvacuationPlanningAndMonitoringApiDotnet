@@ -54,4 +54,25 @@ TestResult.xml
 nunit-*.xml
 
 #visual studio
-.vs
+.vs/
+# Visual Studio Code
+.vscode/
+
+#Docker
+docker-compose.override.yml
+
+# local development environment
+.env
+.env.*
+
+#logs
+*.log
+
+# publish output
+publish/
+wwwroot/dist/
+
+# secrets
+secrets.json
+
+
