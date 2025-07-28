@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\IServices\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Evacuation.Domain\Evacuation.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
