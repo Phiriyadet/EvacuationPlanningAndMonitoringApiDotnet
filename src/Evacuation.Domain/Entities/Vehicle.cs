@@ -10,6 +10,7 @@ namespace Evacuation.Domain.Entities
         public VehicleType Type { get; set; } = VehicleType.Unknown;
         public int Capacity { get; set; }
         public int Speed { get; set; } // Speed in km/h
+        public bool IsAvailable { get; set; } = true; // Indicates if the vehicle is available for use
 
         public LocationCoordinates LocationCoordinates { get; set; } = new LocationCoordinates();
 
