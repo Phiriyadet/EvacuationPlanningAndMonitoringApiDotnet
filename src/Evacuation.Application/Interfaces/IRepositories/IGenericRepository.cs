@@ -5,6 +5,7 @@
         where TKey : notnull
     {
         Task<T?> GetByIdAsync(TKey id);
+        IQueryable<T> GetQuery();
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> AddAsync(T entity);
         Task<T?> UpdateAsync(TKey key, T entity);
