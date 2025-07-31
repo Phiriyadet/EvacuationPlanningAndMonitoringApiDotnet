@@ -2,7 +2,7 @@
 
 namespace Evacuation.Domain.Entities
 {
-    public class EvacuationZone
+    public class Zone
     {
         public string ZoneId { get; set; } = string.Empty;
 
@@ -11,7 +11,7 @@ namespace Evacuation.Domain.Entities
 
         public LocationCoordinates LocationCoordinates { get; set; } = new LocationCoordinates();
 
-        private EvacuationZone() { } // cannot be instantiated directly
+        private Zone() { } // cannot be instantiated directly
 
     }
 }
