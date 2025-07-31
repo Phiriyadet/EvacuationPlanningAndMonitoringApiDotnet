@@ -14,7 +14,7 @@ namespace Evacuation.Domain.Entities
 
         public LocationCoordinates LocationCoordinates { get; set; } = new LocationCoordinates();
 
-        private Vehicle() { } // cannot be instantiated directly
+        //private Vehicle() { } // cannot be instantiated directly
 
     }
 }

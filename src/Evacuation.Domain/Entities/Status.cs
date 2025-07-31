@@ -9,7 +9,7 @@
 
         public string? LastVehicleId { get; set; }
 
-        private Status() { } // cannot be instantiated directly
+        //private Status() { } // cannot be instantiated directly
 
     }
 }
