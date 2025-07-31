@@ -11,9 +11,9 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
         }
         // DbSet properties for your entities
         public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<EvacuationZone> EvacuationZones { get; set; }
-        public DbSet<EvacuationPlan> EvacuationPlans { get; set; }
-        public DbSet<EvacuationStatus> EvacuationStatuses { get; set; }
+        public DbSet<Zone> Zones { get; set; }
+        public DbSet<Plan> Plans { get; set; }
+        public DbSet<Status> Statuses { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -22,41 +22,45 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
             // Key configurations
             modelBuilder.Entity<Vehicle>()
                 .HasKey(v => v.VehicleId);
-            modelBuilder.Entity<EvacuationZone>()
+            modelBuilder.Entity<Zone>()
                 .HasKey(z => z.ZoneId);
-            modelBuilder.Entity<EvacuationPlan>()
+            modelBuilder.Entity<Plan>()
                 .HasKey(p => p.PlanId);
-            modelBuilder.Entity<EvacuationStatus>()
+            modelBuilder.Entity<Status>()
                 .HasKey(s => s.ZoneId);
+
+            modelBuilder.Entity<Plan>()
+                .Property(p => p.PlanId)
+                .ValueGeneratedOnAdd();
 
             // Configure properties if necessary
             modelBuilder.Entity<Vehicle>()
                 .OwnsOne(v => v.LocationCoordinates);
-            modelBuilder.Entity<EvacuationZone>()
+            modelBuilder.Entity<Zone>()
                 .OwnsOne(z => z.LocationCoordinates);
 
             // Configure relationships if necessary
-            modelBuilder.Entity<EvacuationPlan>()
+            modelBuilder.Entity<Plan>()
                 .HasOne<Vehicle>()
-                .WithMany()
-                .HasForeignKey(p => p.VehicleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithOne()
+                .HasForeignKey<Plan>(p => p.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<EvacuationPlan>()
-                .HasOne<EvacuationZone>()
+            modelBuilder.Entity<Plan>()
+                .HasOne<Zone>()
                 .WithMany()
                 .HasForeignKey(p => p.ZoneId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<EvacuationStatus>()
-                .HasOne<EvacuationZone>()
+            modelBuilder.Entity<Status>()
+                .HasOne<Zone>()
                 .WithOne()
-                .HasForeignKey<EvacuationStatus>(s => s.ZoneId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey<Status>(s => s.ZoneId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Indexes for faster queries
-            modelBuilder.Entity<EvacuationPlan>().HasIndex(p => p.VehicleId);
-            modelBuilder.Entity<EvacuationPlan>().HasIndex(p => p.ZoneId);
+            modelBuilder.Entity<Plan>().HasIndex(p => p.VehicleId).IsUnique();
+            modelBuilder.Entity<Plan>().HasIndex(p => p.ZoneId);
 
 
         }
