@@ -11,6 +11,6 @@ namespace Evacuation.Application.DTOs.Zone
         [Range(1, 5, ErrorMessage = "Urgency level must be between 1 and 5.")]
         public int UrgencyLevel { get; set; }
 
-        public LocationCoordinatesDto? Location { get; set; } = new LocationCoordinatesDto();
+        public LocationCoordinatesDto Location { get; set; } = new LocationCoordinatesDto();
     }
 }

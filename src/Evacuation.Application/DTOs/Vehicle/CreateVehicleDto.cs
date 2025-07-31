@@ -19,6 +19,6 @@ namespace Evacuation.Application.DTOs.Vehicle
         public int Speed { get; set; } // Speed in km/h
 
         [Required]
-        public LocationCoordinatesDto location { get; set; } = new LocationCoordinatesDto();
+        public LocationCoordinatesDto Location { get; set; } = new LocationCoordinatesDto();
     }
 }

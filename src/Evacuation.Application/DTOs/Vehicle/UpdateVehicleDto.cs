@@ -16,6 +16,6 @@ namespace Evacuation.Application.DTOs.Vehicle
         [Range(0, int.MaxValue, ErrorMessage = "Speed must be a non-negative integer.")]
         public int Speed { get; set; } // Speed in km/h
 
-        public LocationCoordinatesDto location { get; set; } = new LocationCoordinatesDto();
+        public LocationCoordinatesDto Location { get; set; } = new LocationCoordinatesDto();
     }
 }
