@@ -2,7 +2,8 @@
 
 namespace Evacuation.Application.Interfaces.IRepositories
 {
-    public interface IZoneRepository : IGenericRepository<EvacuationZone, string>
+    public interface IZoneRepository : IGenericRepository<Zone, string>
     {
+        Task<string?> GetLastIdZoneAsync();
     }
 }
