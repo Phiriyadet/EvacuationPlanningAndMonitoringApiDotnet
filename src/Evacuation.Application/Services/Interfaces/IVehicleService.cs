@@ -7,7 +7,7 @@ namespace Evacuation.Application.Services.Interfaces
     {
         Task<OperationResult<IEnumerable<VehicleDto>>> GetAllVehiclesAsync();
         Task<OperationResult<VehicleDto>> GetVehicleByIdAsync(string vehicleId);
-        Task<OperationResult<VehicleDto>> UpdateVehicleAsync(UpdateVehicleDto updateDto);
+        Task<OperationResult<VehicleDto>> UpdateVehicleAsync(UpdateVehicleDto updateDto, string Id);
         Task<OperationResult<bool>> DeleteVehicleAsync(string vehicleId);
         Task<OperationResult<VehicleDto>> AddVehicleAsync(CreateVehicleDto createDto);
     }
