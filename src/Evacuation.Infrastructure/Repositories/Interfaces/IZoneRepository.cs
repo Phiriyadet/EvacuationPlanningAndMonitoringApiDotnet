@@ -1,6 +1,6 @@
 ﻿using Evacuation.Domain.Entities;
 
-namespace Evacuation.Application.Interfaces.IRepositories
+namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
     public interface IZoneRepository : IGenericRepository<Zone, string>
     {

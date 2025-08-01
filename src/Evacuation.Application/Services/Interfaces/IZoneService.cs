@@ -1,7 +1,7 @@
 ﻿using Evacuation.Application.DTOs.Zone;
 using Evacuation.Shared.Result;
 
-namespace Evacuation.Application.Interfaces.IServices
+namespace Evacuation.Application.Services.Interfaces
 {
     public interface IZoneService
     {

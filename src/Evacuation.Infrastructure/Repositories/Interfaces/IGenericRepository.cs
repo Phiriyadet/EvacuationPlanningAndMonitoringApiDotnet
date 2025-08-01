@@ -1,4 +1,4 @@
-﻿namespace Evacuation.Application.Interfaces.IRepositories
+﻿namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
     public interface IGenericRepository<T, TKey>
         where T : class
