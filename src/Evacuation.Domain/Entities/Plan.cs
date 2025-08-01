@@ -2,7 +2,7 @@
 {
     public class Plan
     {
-        public long PlanId { get; set; }
+        public string PlanId { get; set; } = string.Empty;
         public string ZoneId { get; set; } = string.Empty;
         public string VehicleId { get; set; } = string.Empty;
         public int NumberOfEvacuatedPeople { get; set; }

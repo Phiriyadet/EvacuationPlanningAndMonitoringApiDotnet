@@ -22,10 +22,11 @@ namespace Evacuation.Application.Mappers
             return plans.Select(p => p.ToDto());
         }
 
-        public static Plan CreateToEntity(this CreatePlanDto createDto)
+        public static Plan CreateToEntity(this CreatePlanDto createDto, string Id)
         {
             return new Plan
             {
+                PlanId = Id,
                 ZoneId = createDto.ZoneId,
                 VehicleId = createDto.VehicleId,
                 NumberOfEvacuatedPeople = createDto.NumberOfEvacuatedPeople,
