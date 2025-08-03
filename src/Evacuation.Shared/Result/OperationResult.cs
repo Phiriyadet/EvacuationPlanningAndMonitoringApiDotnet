@@ -2,15 +2,15 @@
 {
     public class OperationResult<T>
     {
-        public bool Success { get; private set; }
+        public bool IsSuccess { get; private set; }
         public string? Message { get; private set; }
         public T? Data { get; private set; }
         public Exception? Exception { get; private set; }
         public Dictionary<string, string[]>? Errors { get; private set; }
 
-        private OperationResult(bool success, string? message = null, T? data = default, Exception? exception = null, Dictionary<string, string[]>? errors = null)
+        private OperationResult(bool isSuccess, string? message = null, T? data = default, Exception? exception = null, Dictionary<string, string[]>? errors = null)
         {
-            Success = success;
+            IsSuccess = isSuccess;
             Message = message;
             Data = data;
             Exception = exception;
