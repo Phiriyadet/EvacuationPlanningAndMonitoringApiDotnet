@@ -9,7 +9,7 @@
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> AddAsync(T entity);
         Task<T?> UpdateAsync(TKey key, T entity);
-        Task<T?> DeleteAsync(TKey key);
+        Task<bool> DeleteAsync(TKey key);
         Task<bool> ExistsAsync(TKey key);
 
     }

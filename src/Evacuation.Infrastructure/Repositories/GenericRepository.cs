@@ -25,16 +25,16 @@ namespace Evacuation.Infrastructure.Repositories
             return entry.Entity;
         }
 
-        public async Task<T?> DeleteAsync(TKey key)
+        public async Task<bool> DeleteAsync(TKey key)
         {
             var entity = await _dbSet.FindAsync(key);
             if (entity == null)
             {
-                return null;
+                return false;
             }
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return true;
         }
 
         public async Task<bool> ExistsAsync(TKey key)
