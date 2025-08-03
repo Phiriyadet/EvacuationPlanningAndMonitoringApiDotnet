@@ -7,72 +7,77 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
-# Build results
+# Ignore common backup, temp files, and IDE settings
+*~
+~$*
+*.bak
+*.tmp
+*.log
+*.binlog
+
+# ------------------
+#  Build and Compilation
+# ------------------
+# Visual Studio and .NET build results
+[Bb]in/
+[Oo]bj/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+artifacts/
+
+# Platform-specific build folders
 x64/
 x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
 
-# .NET Core
+# Intermediate and temporary files
 project.lock.json
 project.fragment.lock.json
-artifacts/
+bld/
 
-# ASP.NET Scaffolding
-ScaffoldingReadMe.txt
-
-# NuGet Packages
-*.nupkg
-# NuGet Symbol Packages
-*.snupkg
-
-# Others
-~$*
-*~
-CodeCoverage/
-
-# MSBuild Binary and Structured Log
-*.binlog
-
-# MSTest test Results
-[Tt]est[Rr]esult*/
+# MSBuild and test results
 [Bb]uild[Ll]og.*
+[Tt]est[Rr]esult*/
+[Cc]ode[Cc]overage/
 
-# NUnit
-*.VisualState.xml
-TestResult.xml
-nunit-*.xml
-
-#visual studio
+# ------------------
+#  Visual Studio and IDE
+# ------------------
+# Visual Studio solution and user-specific files
 .vs/
-# Visual Studio Code
+*.suo
+*.user
+*.pdb
+*.VisualState.xml
+
+# VS Code settings
 .vscode/
 
-#Docker
-docker-compose.override.yml
+# ------------------
+#  NuGet and Packages
+# ------------------
+# NuGet packages and symbols
+[Pp]ackages/
+*.nupkg
+*.snupkg
 
-# local development environment
+# ------------------
+#  Web and Publish
+# ------------------
+# Publish output, deployment folders
+[Pp]ublish/
+[Ww]wwroot/dist/
+ScaffoldingReadMe.txt
+
+# ------------------
+#  Security and Environment
+# ------------------
+# Local environment variables and secrets
 .env
 .env.*
-
-#logs
-*.log
-
-# publish output
-publish/
-wwwroot/dist/
-
-# secrets
 secrets.json
-
-
+docker-compose.override.yml
