@@ -1,0 +1,6 @@
+services:
+  evacuation.api:
+    image: ${DOCKER_REGISTRY-}evacuationapi
+    build:
+      context: .
+      dockerfile: src/Evacuation.API/Dockerfile
