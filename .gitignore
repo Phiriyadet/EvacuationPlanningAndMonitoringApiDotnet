@@ -80,4 +80,5 @@ ScaffoldingReadMe.txt
 .env
 .env.*
 secrets.json
+appsettings.Development.json
 docker-compose.override.yml
