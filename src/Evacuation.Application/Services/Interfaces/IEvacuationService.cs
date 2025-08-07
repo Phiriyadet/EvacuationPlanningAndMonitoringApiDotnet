@@ -8,9 +8,9 @@ namespace Evacuation.Application.Services.Interfaces
     {
         Task<OperationResult<IEnumerable<StatusDto>>> GetAllStatusAsync();
         Task<OperationResult<StatusDto>> GetStatusByIdAsync(string statusId);
-        Task<OperationResult<StatusDto>> UpdateStatusByPlanAsync();
-        Task<OperationResult<PlanDto>> CreatePlanAsync(double distanceKm);
-        Task<OperationResult<PlanDto>> GetPlanByZoneIdAsync(string zoneId);
+        Task<OperationResult<IEnumerable<StatusDto>>> UpdateStatusByPlanAsync();
+        Task<OperationResult<IEnumerable<PlanDto>>> CreatePlanAsync(double distanceKm);
+        Task<OperationResult<IEnumerable<PlanDto>>> GetPlanByZoneIdAsync(string zoneId);
         Task<OperationResult<IEnumerable<PlanDto>>> GetAllPlansAsync();
         Task<OperationResult<bool>> ClearAllPlanAndStatusAsync();
 
