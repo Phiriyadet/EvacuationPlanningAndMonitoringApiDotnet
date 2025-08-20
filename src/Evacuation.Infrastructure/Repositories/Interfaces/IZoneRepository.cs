@@ -2,8 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    public interface IZoneRepository : IGenericRepository<Zone, string>
+    public interface IZoneRepository : IGenericRepository<Zone, int>
     {
-        Task<string?> GetLastIdZoneAsync();
     }
 }

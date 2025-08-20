@@ -2,8 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    public interface IVehicleRepository : IGenericRepository<Vehicle, string>
+    public interface IVehicleRepository : IGenericRepository<Vehicle, int>
     {
-        Task<string?> GetLastIdVehicleAsync();
     }
 }

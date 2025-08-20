@@ -2,8 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    public interface IPlanRepository : IGenericRepository<Plan, string>
+    public interface IPlanRepository : IGenericRepository<Plan, int>
     {
-        Task<string?> GetLastIdPlanAsync();
     }
 }
