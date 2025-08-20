@@ -7,10 +7,10 @@ namespace Evacuation.Application.Services.Interfaces
     public interface IEvacuationService
     {
         Task<OperationResult<IEnumerable<StatusDto>>> GetAllStatusAsync();
-        Task<OperationResult<StatusDto>> GetStatusByIdAsync(string statusId);
+        Task<OperationResult<StatusDto>> GetStatusByIdAsync(int statusId);
         Task<OperationResult<IEnumerable<StatusDto>>> UpdateStatusByPlanAsync();
         Task<OperationResult<IEnumerable<PlanDto>>> CreatePlanAsync(double distanceKm);
-        Task<OperationResult<IEnumerable<PlanDto>>> GetPlanByZoneIdAsync(string zoneId);
+        Task<OperationResult<IEnumerable<PlanDto>>> GetPlanByZoneIdAsync(int zoneId);
         Task<OperationResult<IEnumerable<PlanDto>>> GetAllPlansAsync();
         Task<OperationResult<bool>> ClearAllPlanAndStatusAsync();
 
