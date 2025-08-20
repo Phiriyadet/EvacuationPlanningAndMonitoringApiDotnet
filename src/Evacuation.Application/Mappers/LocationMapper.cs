@@ -17,10 +17,10 @@ namespace Evacuation.Application.Mappers
         public static LocationCoordinates ToEntity(this LocationCoordinatesDto locationDto)
         {
             return new LocationCoordinates
-            {
-                Latitude = locationDto.Latitude,
-                Longitude = locationDto.Longitude,
-            };
+            (
+                locationDto.Latitude,
+                locationDto.Longitude
+            );
         }
     }
       

@@ -9,7 +9,7 @@ namespace Evacuation.Application.Mappers
         {
             return new ZoneDto
             {
-                ZoneId = zone.ZoneId,
+                ZoneId = zone.BusinessId,
                 NumberOfPeople = zone.NumberOfPeople,
                 UrgencyLevel = zone.UrgencyLevel,
                 Location = zone.LocationCoordinates.ToDto()
@@ -21,25 +21,25 @@ namespace Evacuation.Application.Mappers
             return zones.Select(z => z.ToDto());
         }
 
-        public static Zone CreateToEntity(this CreateZoneDto createDto, string id)
+        public static Zone CreateToEntity(this CreateZoneDto createDto)
         {
             return new Zone
-            {
-                ZoneId = id,
-                NumberOfPeople = createDto.NumberOfPeople,
-                UrgencyLevel = createDto.UrgencyLevel,
-                LocationCoordinates = createDto.Location.ToEntity()
-            };
+            (
+                createDto.NumberOfPeople,
+                createDto.UrgencyLevel,
+                createDto.Location.ToEntity()
+            );
         }
 
-        public static Zone UpdateToEntity(this UpdateZoneDto updateDto)
+        public static Zone UpdateToEntity(this UpdateZoneDto updateDto, Zone existingZone)
         {
-            return new Zone
-            {
-                NumberOfPeople = updateDto.NumberOfPeople,
-                UrgencyLevel = updateDto.UrgencyLevel,
-                LocationCoordinates = updateDto.Location.ToEntity()
-            };
+            existingZone.Update
+            (
+                updateDto.NumberOfPeople,
+                updateDto.UrgencyLevel,
+                updateDto.Location.ToEntity()
+            );
+            return existingZone;
         }
 
     }

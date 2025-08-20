@@ -5,41 +5,48 @@ namespace Evacuation.Application.Mappers
 {
     public static class StatusMapper
     {
-        public static StatusDto ToDto(this Status status)
+        public static StatusDto ToDto(this Status status, string zoneId, string lastVehicleUsedId)
         {
             return new StatusDto
             {
-                ZoneId = status.ZoneId,
-                TotalPeopleEvacuated = status.TotalPeopleEvacuated,
+                StatusId = status.BusinessId,
+                ZoneId = zoneId,
+                TotalEvacuatedPeople = status.TotalEvacuatedPeople,
                 RemainingPeople = status.RemainingPeople,
-                LastVehicleId = status.LastVehicleId
+                LastVehicleUsedId = lastVehicleUsedId
             };
         }
 
-        public static IEnumerable<StatusDto> ToDto(this IEnumerable<Status> statuses)
+        public static IEnumerable<StatusDto> ToDto(this IEnumerable<Status> statuses,
+        IDictionary<int, string> zoneIdMap, 
+        IDictionary<int, string> vehicleIdMap)
         {
-            return statuses.Select(s => s.ToDto());
+            return statuses.Select(s => s.ToDto(
+                zoneIdMap[s.ZoneId],
+                vehicleIdMap[s.LastVehicleIdUsed]
+            ));
         }
 
         public static Status CreateToEntity(this CreateStatusDto createDto)
         {
             return new Status
-            {
-                ZoneId = createDto.ZoneId,
-                TotalPeopleEvacuated = createDto.TotalPeopleEvacuated,
-                RemainingPeople = createDto.RemainingPeople,
-                LastVehicleId = createDto.LastVehicleId
-            };
+            (
+                createDto.ZoneId,
+                createDto.TotalEvacuatedPeople,
+                createDto.RemainingPeople,
+                createDto.LastVehicleUsedId
+            );
         }
 
-        public static Status UpdateToEntity(this UpdateStatusDto updateDto)
+        public static Status UpdateToEntity(this UpdateStatusDto updateDto, Status existingStatus)
         {
-            return new Status
-            {
-                TotalPeopleEvacuated = updateDto.TotalPeopleEvacuated,
-                RemainingPeople = updateDto.RemainingPeople,
-                LastVehicleId = updateDto.LastVehicleId
-            };
+            existingStatus.Update
+            (
+                updateDto.TotalEvacuatedPeople,
+                updateDto.RemainingPeople,
+                updateDto.LastVehicleUsedId
+            );
+            return existingStatus;
         }
     }
 }

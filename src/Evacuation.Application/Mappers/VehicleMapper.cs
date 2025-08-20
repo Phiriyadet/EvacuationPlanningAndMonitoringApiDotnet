@@ -9,7 +9,7 @@ namespace Evacuation.Application.Mappers
         {
             return new VehicleDto
             {
-                VehicleId = vehicle.VehicleId,
+                VehicleId = vehicle.BusinessId,
                 Type = vehicle.Type,
                 Capacity = vehicle.Capacity,
                 Speed = vehicle.Speed,
@@ -23,28 +23,28 @@ namespace Evacuation.Application.Mappers
             return vehicles.Select(v => v.ToDto());
         }
 
-        public static Vehicle CreateToEntity(this CreateVehicleDto createDto, string Id)
+        public static Vehicle CreateToEntity(this CreateVehicleDto createDto)
         {
             return new Vehicle
-            {
-                VehicleId = Id,
-                Type = createDto.Type,
-                Capacity = createDto.Capacity,
-                Speed = createDto.Speed,
-                IsAvailable = true, // Default to available when created
-                LocationCoordinates = createDto.Location.ToEntity()
-            };
+            (
+                createDto.Type,
+                createDto.Capacity,
+                createDto.Speed,
+                true, // Default to available when creating
+                createDto.Location.ToEntity()
+            );
         }
 
-        public static Vehicle UpdateToEntity(this UpdateVehicleDto updateDto)
+        public static Vehicle UpdateToEntity(this UpdateVehicleDto updateDto, Vehicle existingVehicle)
         {
-            return new Vehicle
-            {
-                Type = updateDto.Type,
-                Capacity = updateDto.Capacity,
-                Speed = updateDto.Speed,
-                LocationCoordinates = updateDto.Location.ToEntity()
-            };
+            existingVehicle.Update
+            (
+                updateDto.Type,
+                updateDto.Capacity,
+                updateDto.Speed,
+                updateDto.Location.ToEntity()
+            );
+            return existingVehicle;
         }
     }
 }
