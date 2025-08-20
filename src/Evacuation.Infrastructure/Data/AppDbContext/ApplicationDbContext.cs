@@ -21,23 +21,40 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
 
             // Key configurations
             modelBuilder.Entity<Vehicle>()
-                .HasKey(v => v.VehicleId);
+                .HasKey(v => v.Id);
             modelBuilder.Entity<Zone>()
-                .HasKey(z => z.ZoneId);
+                .HasKey(z => z.Id);
             modelBuilder.Entity<Plan>()
-                .HasKey(p => p.PlanId);
+                .HasKey(p => p.Id);
             modelBuilder.Entity<Status>()
-                .HasKey(s => s.ZoneId);
+                .HasKey(s => s.Id);
 
+            modelBuilder.Entity<Vehicle>()
+                .Property(v => v.Id)
+                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<Zone>()
+                .Property(z => z.Id)
+                .ValueGeneratedOnAdd();
             modelBuilder.Entity<Plan>()
-                .Property(p => p.PlanId)
+                .Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+            modelBuilder.Entity<Status>()
+                .Property(s => s.Id)
                 .ValueGeneratedOnAdd();
 
             // Configure properties if necessary
             modelBuilder.Entity<Vehicle>()
-                .OwnsOne(v => v.LocationCoordinates);
+                .OwnsOne(v => v.LocationCoordinates, lc => 
+                {
+                    lc.Property(l => l.Latitude).HasColumnName("Latitude");
+                    lc.Property(l => l.Longitude).HasColumnName("Longitude");
+                });
             modelBuilder.Entity<Zone>()
-                .OwnsOne(z => z.LocationCoordinates);
+                .OwnsOne(z => z.LocationCoordinates, lc =>
+                {
+                    lc.Property(l => l.Latitude).HasColumnName("Latitude");
+                    lc.Property(l => l.Longitude).HasColumnName("Longitude");
+                });
 
             // Configure relationships if necessary
             modelBuilder.Entity<Plan>()
