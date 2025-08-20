@@ -10,7 +10,7 @@ namespace Evacuation.Application.DTOs.Vehicle
         public VehicleType Type { get; set; } = VehicleType.Unknown;
         public int Capacity { get; set; }
         public int Speed { get; set; } // Speed in km/h
-        public bool IsAvailable { get; set; } = true; // Indicates if the vehicle is available for use
+        public bool IsAvailable { get; set; }// Indicates if the vehicle is available for use
 
         public LocationCoordinatesDto Location { get; set; } = new LocationCoordinatesDto();
     }

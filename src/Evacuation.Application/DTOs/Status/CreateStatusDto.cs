@@ -2,11 +2,11 @@
 {
     public class CreateStatusDto
     {
-        public string ZoneId { get; set; } = string.Empty;
+        public int ZoneId { get; set; }
 
-        public int TotalPeopleEvacuated { get; set; }
+        public int TotalEvacuatedPeople { get; set; }
         public int RemainingPeople { get; set; }
 
-        public string? LastVehicleId { get; set; }
+        public int LastVehicleUsedId { get; set; }
     }
 }

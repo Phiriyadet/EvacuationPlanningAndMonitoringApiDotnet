@@ -2,9 +2,9 @@
 {
     public class UpdateStatusDto
     {
-        public int TotalPeopleEvacuated { get; set; }
+        public int TotalEvacuatedPeople { get; set; }
         public int RemainingPeople { get; set; }
 
-        public string? LastVehicleId { get; set; }
+        public int LastVehicleUsedId { get; set; }
     }
 }
