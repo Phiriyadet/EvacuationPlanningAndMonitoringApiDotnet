@@ -1,11 +1,12 @@
-﻿using Evacuation.Infrastructure.Data.AppDbContext;
+﻿using Evacuation.Domain.Entities;
+using Evacuation.Infrastructure.Data.AppDbContext;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evacuation.Infrastructure.Repositories
 {
     public class GenericRepository<T, TKey> : IGenericRepository<T, TKey>
-            where T : class
+            where T : BaseEntityWithPrefix
             where TKey : notnull
     {
         protected readonly ApplicationDbContext _context;
@@ -55,6 +56,12 @@ namespace Evacuation.Infrastructure.Repositories
                 return null;
             }
             return entity;
+        }
+
+        public Task<Dictionary<TKey, string>> GetIdMapAsync()
+        {
+            return _dbSet.AsNoTracking()
+            .ToDictionaryAsync(e => (TKey)(object)e.Id, e => e.BusinessId);
         }
 
         public IQueryable<T> GetQuery()
