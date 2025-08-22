@@ -23,7 +23,7 @@
         public static OperationResult<T> Ok(string? message = null) 
             => new OperationResult<T>(true, message);
 
-        public static OperationResult<T> Fail(string message, T? data, Exception? exception = null)
+        public static OperationResult<T> Fail(string message, T? data = default, Exception? exception = null)
             => new OperationResult<T>(false, message, data, exception);
 
         public static OperationResult<T> Fail(Dictionary<string, string[]> errors, string? message = null)
