@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evacuation.API.Controllers
 {
-    [Route("api/evacuations")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class EvacuationController : ControllerBase
+    public class EvacuationsController : ControllerBase
     {
         private readonly IEvacuationService _evacuationService;
-        public EvacuationController(IEvacuationService evacuationService)
+        public EvacuationsController(IEvacuationService evacuationService)
         {
             _evacuationService = evacuationService;
         }

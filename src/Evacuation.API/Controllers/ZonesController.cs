@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evacuation.API.Controllers
 {
-    [Route("api/zones")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ZoneController : ControllerBase
     {

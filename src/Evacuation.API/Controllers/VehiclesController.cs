@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evacuation.API.Controllers
 {
-    [Route("api/vehicles")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class VehicleController : ControllerBase
+    public class VehiclesController : ControllerBase
     {
         private readonly IVehicleService _vehicleService;
-        public VehicleController(IVehicleService vehicleService)
+        public VehiclesController(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }
