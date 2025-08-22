@@ -2,7 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    public interface IZoneRepository : IGenericRepository<Zone, int>
+    public interface IZoneRepository : IGenericWithPrefixRepository<Zone, int>
     {
     }
 }

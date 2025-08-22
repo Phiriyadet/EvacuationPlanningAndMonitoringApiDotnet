@@ -2,7 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    public interface IVehicleRepository : IGenericRepository<Vehicle, int>
+    public interface IVehicleRepository : IGenericWithPrefixRepository<Vehicle, int>
     {
     }
 }
