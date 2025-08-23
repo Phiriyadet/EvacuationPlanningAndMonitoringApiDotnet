@@ -2,7 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    internal interface IRoleRepository : IGenericRepository<Role, int>
+    public interface IRoleRepository : IGenericRepository<Role, int>
     {
     }
 }
