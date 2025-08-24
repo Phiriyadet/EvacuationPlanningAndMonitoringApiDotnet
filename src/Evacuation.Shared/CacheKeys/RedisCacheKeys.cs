@@ -1,6 +1,6 @@
 ﻿namespace Evacuation.Shared.CacheKeys
 {
-    public static class RedisCacheKays
+    public static class RedisCacheKeys
     {
         public const string VehicleCacheKey = "VehicleCacheKey";
         public const string ZoneCacheKey = "ZoneCacheKey";
