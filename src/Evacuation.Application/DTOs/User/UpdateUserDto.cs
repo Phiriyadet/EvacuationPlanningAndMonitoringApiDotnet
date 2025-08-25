@@ -8,7 +8,5 @@ namespace Evacuation.Application.DTOs.User
         [EmailAddress]
         public string? Email { get; set; }
         public string? Password { get; set; }
-        public int? RoleId { get; set; }
-        public bool? IsActive { get; set; }
     }
 }
