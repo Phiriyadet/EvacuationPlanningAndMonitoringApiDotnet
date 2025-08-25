@@ -1,4 +1,6 @@
 ﻿
+using Evacuation.Domain.Enums;
+
 namespace Evacuation.Domain.Entities
 {
     public class User : BaseEntity
@@ -7,26 +9,31 @@ namespace Evacuation.Domain.Entities
         public string Email { get; private set; } = null!;
         public string PasswordHash { get; private set; } = null!; // เก็บ hash
         public bool IsActive { get; private set; } = true;
-
-        // FK
-        public int RoleId { get; private set; }
+        public RoleType Role { get; private set; }
 
         protected User() { }
 
-        public User(string username, string email, string passwordHash, int roleId)
+        public User(string username, string email, string passwordHash, RoleType role)
         {
-            ValidateUser(username, email, passwordHash, roleId);
+            ValidateUser(username, email, passwordHash, role);
             Username = username;
             Email = email;
             PasswordHash = passwordHash;
-            RoleId = roleId;
+            Role = role;
         }
 
-        public void Update(string? username = null, string? email = null, int? roleId = null)
+        public void Update(string? username = null, string? email = null)
         {
             if (!string.IsNullOrWhiteSpace(username)) Username = username;
             if (!string.IsNullOrWhiteSpace(email)) Email = email;
-            if (roleId.HasValue && roleId.Value > 0) RoleId = roleId.Value;
+            SetUpdateAt();
+        }
+
+        public void AssignRole(RoleType role)
+        {
+            if (!Enum.IsDefined(typeof(RoleType), role)) 
+                throw new ArgumentException("Invalid role.", nameof(role));
+            Role = role;
             SetUpdateAt();
         }
 
@@ -44,7 +51,7 @@ namespace Evacuation.Domain.Entities
         }
 
 
-        private void ValidateUser(string username, string email, string passwordHash, int roleId)
+        private void ValidateUser(string username, string email, string passwordHash, RoleType role)
         {
             if (string.IsNullOrWhiteSpace(username))
                 throw new ArgumentException("Username is required.", nameof(username));
@@ -52,8 +59,8 @@ namespace Evacuation.Domain.Entities
                 throw new ArgumentException("Email is required.", nameof(email));
             if (string.IsNullOrWhiteSpace(passwordHash))
                 throw new ArgumentException("PasswordHash is required.", nameof(passwordHash));
-            if (roleId <= 0)
-                throw new ArgumentException("RoleId must be greater than zero.", nameof(roleId));
+            if (!Enum.IsDefined(typeof(RoleType), role))
+                throw new ArgumentException("Invalid role.", nameof(role));
         }
     }
 }
