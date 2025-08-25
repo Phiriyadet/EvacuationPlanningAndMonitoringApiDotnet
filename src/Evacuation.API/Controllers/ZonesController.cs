@@ -1,5 +1,6 @@
 ﻿using Evacuation.Application.DTOs.Zone;
 using Evacuation.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -8,6 +9,7 @@ namespace Evacuation.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "ADMIN,MANAGER")]
     public class ZoneController : ControllerBase
     {
         private readonly IZoneService _zoneService;
@@ -17,7 +19,7 @@ namespace Evacuation.API.Controllers
         }
         // GET: api/<ZoneController>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAllAsync()
         {
             var result = await _zoneService.GetAllZonesAsync();
             if (!result.IsSuccess)
@@ -36,7 +38,7 @@ namespace Evacuation.API.Controllers
 
         // GET api/<ZoneController>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
             var result = await _zoneService.GetZoneByIdAsync(id);
             if (!result.IsSuccess)
@@ -55,7 +57,7 @@ namespace Evacuation.API.Controllers
 
         // POST api/<ZoneController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CreateZoneDto zoneDto)
+        public async Task<IActionResult> AddAsync([FromBody] CreateZoneDto zoneDto)
         {
             var result = await _zoneService.AddZoneAsync(zoneDto);
             if (!result.IsSuccess)
@@ -69,12 +71,12 @@ namespace Evacuation.API.Controllers
                     return BadRequest(new { Message = result.Message, Errors = result.Errors });
                 }
             }
-            return CreatedAtAction(nameof(Get), new { id = result.Data!.ZoneId }, result.Data);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Data!.ZoneId }, result.Data);
         }
 
         // PUT api/<ZoneController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UpdateZoneDto zoneDto)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateZoneDto zoneDto)
         {
             var result = await _zoneService.UpdateZoneAsync(id, zoneDto);
             if (!result.IsSuccess)
@@ -93,7 +95,7 @@ namespace Evacuation.API.Controllers
 
         // DELETE api/<ZoneController>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _zoneService.DeleteZoneAsync(id);
             if (!result.IsSuccess)
