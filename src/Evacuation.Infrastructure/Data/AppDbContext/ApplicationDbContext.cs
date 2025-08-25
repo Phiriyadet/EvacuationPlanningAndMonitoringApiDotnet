@@ -10,6 +10,7 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
         {
         }
         // DbSet properties for your entities
+        public DbSet<User> Users { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Zone> Zones { get; set; }
         public DbSet<Plan> Plans { get; set; }
@@ -20,6 +21,8 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
             // Configure entity properties and relationships here
 
             // Key configurations
+            modelBuilder.Entity<User>()
+                .HasKey(u => u.Id);
             modelBuilder.Entity<Vehicle>()
                 .HasKey(v => v.Id);
             modelBuilder.Entity<Zone>()
@@ -29,6 +32,9 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
             modelBuilder.Entity<Status>()
                 .HasKey(s => s.Id);
 
+            modelBuilder.Entity<User>()
+                .Property(u => u.Id)
+                .ValueGeneratedOnAdd();
             modelBuilder.Entity<Vehicle>()
                 .Property(v => v.Id)
                 .ValueGeneratedOnAdd();
@@ -79,7 +85,7 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
             modelBuilder.Entity<Plan>().HasIndex(p => p.VehicleId).IsUnique();
             modelBuilder.Entity<Plan>().HasIndex(p => p.ZoneId);
 
-
+            
         }
 
 
