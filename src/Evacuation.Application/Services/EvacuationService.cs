@@ -9,6 +9,8 @@ using Evacuation.Shared.CacheKeys;
 using Evacuation.Shared.Cal;
 using Evacuation.Shared.Result;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Numerics;
 
 namespace Evacuation.Application.Services
 {
@@ -19,19 +21,27 @@ namespace Evacuation.Application.Services
         private readonly IZoneRepository _zoneRepo;
         private readonly IVehicleRepository _vehicleRepo;
         private readonly ICacheService _cacheService;
+        private readonly ILogger<EvacuationService> _logger;
 
-        public EvacuationService(IPlanRepository planRepo, IStatusRepository statusRepo,
-            IZoneRepository zoneRepo, IVehicleRepository vehicleRepo, ICacheService cacheService)
+        public EvacuationService(
+            IPlanRepository planRepo, 
+            IStatusRepository statusRepo,
+            IZoneRepository zoneRepo, 
+            IVehicleRepository vehicleRepo, 
+            ICacheService cacheService,
+            ILogger<EvacuationService> logger)
         {
             _planRepo = planRepo;
             _statusRepo = statusRepo;
             _zoneRepo = zoneRepo;
             _vehicleRepo = vehicleRepo;
             _cacheService = cacheService;
+            _logger = logger;
         }
 
         public async Task<OperationResult<bool>> ClearAllPlanAndStatusAsync()
         {
+            _logger.LogWarning("At Time {Time}, ClearAllPlanAndStatusAsync called", DateTime.UtcNow);
             try 
             {
                 // Clear all plans
@@ -54,27 +64,36 @@ namespace Evacuation.Application.Services
                         await _cacheService.RemoveAsync(CreateCacheKeyForStatus(status.ZoneId));
                     }
                 }
-                
+
+                _logger.LogInformation("All plans and statuses cleared successfully.");
                 return OperationResult<bool>.Ok(true, "All plans and statuses cleared successfully.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while clearing all plans and statuses.");
                 return OperationResult<bool>.Fail("An error occurred while clearing all plans and statuses.", false, ex);
             }
         }
 
+        /// <summary>
+        /// สร้าง cache key สำหรับ status โดยใช้ zoneId
+        /// </summary>
+        /// <param name="zoneId"></param>
+        /// <returns>คืนค่า StatusCacheKey:1</returns>
         private string CreateCacheKeyForStatus(int zoneId)
         {
-            return $"{RedisCacheKays.StatusCacheKey}:{zoneId}";
+            return $"{RedisCacheKeys.StatusCacheKey}:{zoneId}";
         }
 
         public async Task<OperationResult<IEnumerable<PlanDto>>> CreatePlanAsync(double distanceKm)
         {
+            _logger.LogWarning("At Time {Time}, CreatePlanAsync called", DateTime.UtcNow);
             try 
             {
                 // Validate distance
-                if (distanceKm <= 0)
+                if (distanceKm < 0)
                 {
+                    _logger.LogWarning("Invalid distance: {DistanceKm}. Distance must be greater than zero.", distanceKm);
                     return OperationResult<IEnumerable<PlanDto>>.Fail("Distance must be greater than zero.", null);
                 }
 
@@ -82,12 +101,14 @@ namespace Evacuation.Application.Services
                     .ThenByDescending(z => z.NumberOfPeople).ToListAsync();
                 if (sortedZones.Count == 0) 
                 {
+                    _logger.LogWarning("No zones available to create a plan.");
                     return OperationResult<IEnumerable<PlanDto>>.Fail("No zones available to create a plan.", null);
                 }
 
                 var vehicles = await _vehicleRepo.GetQuery().Where(v => v.IsAvailable == true).ToListAsync();
                 if (vehicles.Count == 0)
                 {
+                    _logger.LogWarning("No available vehicles to create a plan.");
                     return OperationResult<IEnumerable<PlanDto>>.Fail("No available vehicles to create a plan.", null);
                 }
 
@@ -99,12 +120,14 @@ namespace Evacuation.Application.Services
                     var remainingPeople = await GetRemainingPeopleFromCacheOrZone(zone);
                     if (remainingPeople <= 0)
                     {
+                        _logger.LogInformation("Zone ID {ZoneId} has no remaining people to evacuate.", zone.Id);
                         continue; // Skip this zone if no people left
                     }
 
                     var candidateVehicles = FindCandidateVehicleForZone(zone, vehicles, distanceKm); // Implement logic to find vehicles for the zone
                     if (candidateVehicles.Count == 0)
                     {
+
                         continue; // Skip this zone if no vehicles found
                     }
 
@@ -113,6 +136,7 @@ namespace Evacuation.Application.Services
                         var bestVehicle = FindBestVehicle(candidateVehicles, usedVehicleIds, remainingPeople); // Find the best vehicle for the remaining people
                         if (bestVehicle == null)
                         {
+
                             break; // No suitable vehicle found, exit the loop
                         }
                         var (vehicle, distance) = bestVehicle.Value;
@@ -142,6 +166,7 @@ namespace Evacuation.Application.Services
                         var newPlan = await CreateNewPlan(cretePlanDto);
                         if (newPlan == null)
                         {
+                            _logger.LogWarning("Failed to create a new plan for zone id {zoneId} with vehicle id {vehicleId}", zone.Id, vehicle.Id);
                             return OperationResult<IEnumerable<PlanDto>>.Fail("Failed to create a new plan.", null);
                         }
                         var zondId = zone.BusinessId;
@@ -152,22 +177,22 @@ namespace Evacuation.Application.Services
                 } // End of zone loop
                 if (planList.Count == 0)
                 {
+                    _logger.LogWarning("No plans were created.");
                     return OperationResult<IEnumerable<PlanDto>>.Fail("No plans were created.", null);
                 }
 
+                _logger.LogInformation("{Count} plans created successfully.", planList.Count);
                 return OperationResult<IEnumerable<PlanDto>>.Ok(planList, "Plans created successfully.");
 
             }
             catch (DbUpdateException dbEx)
             {
+                _logger.LogError(dbEx, "Database update error occurred while creating the plan.");
                 return OperationResult<IEnumerable<PlanDto>>.Fail("Database update error occurred while creating the plan.", null, dbEx);
-            }
-            catch (ArgumentException argEx)
-            {
-                return OperationResult<IEnumerable<PlanDto>>.Fail(argEx.Message, null);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while creating the plan.");
                 return OperationResult<IEnumerable<PlanDto>>.Fail("An error occurred while creating the plan.", null, ex);
             }
         }
@@ -241,50 +266,60 @@ namespace Evacuation.Application.Services
 
         private async Task<(Dictionary<int, string> ZoneMap, Dictionary<int, string> VehicleMap)> GetZoneAndVehicleMapsAsync()
         {
-            var zoneTask = _zoneRepo.GetIdMapAsync();
-            var vehicleTask = _vehicleRepo.GetIdMapAsync();
+            var zoneTask = await _zoneRepo.GetIdMapAsync();
+            var vehicleTask = await _vehicleRepo.GetIdMapAsync();
 
-            await Task.WhenAll(zoneTask, vehicleTask);
-
-            return (zoneTask.Result, vehicleTask.Result);
+         
+            return (zoneTask, vehicleTask);
         }
 
 
         public async Task<OperationResult<IEnumerable<PlanDto>>> GetAllPlansAsync()
         {
+            _logger.LogWarning("At Time {Time}, GetAllPlansAsync called", DateTime.UtcNow);
             try 
             {
                 var plans = await _planRepo.GetAllAsync();
                 var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
                 if (zoneIdMap == null || vehicleIdMap == null)
                 {
+                    _logger.LogWarning("Zone or Vehicle ID map not found.");
                     return OperationResult<IEnumerable<PlanDto>>.Fail("Zone or Vehicle ID map not found.", null);
                 }
-                var planDtos = plans.ToDto(zoneIdMap, vehicleIdMap);
 
+                var planDtos = plans.ToDto(zoneIdMap, vehicleIdMap);
+                //var planDtos = plans.ToDto();
                 if (plans == null || !plans.Any())
                 {
+                    _logger.LogWarning("No plans found.");
                     return OperationResult<IEnumerable<PlanDto>>.Fail("No plans found.", null);
                 }
+
+                _logger.LogInformation("{Count} plans retrieved successfully.", planDtos.Count());
                 return OperationResult<IEnumerable<PlanDto>>.Ok(planDtos, "Plans retrieved successfully.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving plans.");
                 return OperationResult<IEnumerable<PlanDto>>.Fail("An error occurred while retrieving plans.", null, ex);
             }
         }
 
         public async Task<OperationResult<IEnumerable<StatusDto>>> GetAllStatusAsync()
         {
+            _logger.LogWarning("At Time {Time}, GetAllStatusAsync called", DateTime.UtcNow);
             try
             {
                 var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
-                var statusCacheKeys = await _cacheService.GetAsync<HashSet<int>>(RedisCacheKays.StatusHashKey);
+
+                _logger.LogInformation("Get Statuses Key from cache if available.");
+                var statusCacheKeys = await _cacheService.GetAsync<HashSet<int>>(RedisCacheKeys.StatusHashKey);
                 if (statusCacheKeys != null && statusCacheKeys.Any())
                 {
                     var statusList = new List<StatusDto>();
                     foreach (var cacheKey in statusCacheKeys)
                     {
+                        _logger.LogInformation("Get Status from cache for cache key {CacheKey}.", cacheKey);
                         var cachedStatus = await _cacheService.GetAsync<Status>(CreateCacheKeyForStatus(cacheKey));
                         if (cachedStatus != null)
                         {
@@ -297,9 +332,12 @@ namespace Evacuation.Application.Services
                         }
                         else
                         {
-                            return OperationResult<IEnumerable<StatusDto>>.Fail($"No status found for cache key {cacheKey}.", null);
+                            _logger.LogWarning("No status found for cache key {CacheKey}", cacheKey);
+
                         }
                     }
+
+                    _logger.LogInformation("{Count} statuses retrieved from cache successfully.", statusList.Count);
                     return OperationResult<IEnumerable<StatusDto>>.Ok(statusList, "Statuses retrieved from cache successfully.");
                 }
                 else
@@ -307,57 +345,65 @@ namespace Evacuation.Application.Services
                     var statuses = await _statusRepo.GetAllAsync();
                     if (statuses == null || !statuses.Any())
                     {
+                        _logger.LogWarning("No statuses found in database");
                         return OperationResult<IEnumerable<StatusDto>>.Fail("No statuses found.", null);
                     }
                     
                     // If no cache keys, retrieve from repository
                     var zoneIds = statuses.Select(s => s.ZoneId).ToHashSet();
-                    await _cacheService.SetAsync(RedisCacheKays.StatusHashKey, zoneIds);
-
+                    await _cacheService.SetAsync(RedisCacheKeys.StatusHashKey, zoneIds);
+                    _logger.LogInformation("Saved status zone IDs to cache.");
 
                     // Update cache with all statuses
                     foreach (var status in statuses)
                     {
                         var cacheKey = CreateCacheKeyForStatus(status.ZoneId);
                         await _cacheService.SetAsync(cacheKey, status);
-                    
                     }
-
+                    _logger.LogInformation("Saved {Count} statuses to cache.", statuses.Count());
+                    _logger.LogInformation("{Count} statuses retrieved successfully.", statuses.Count());
                     return OperationResult<IEnumerable<StatusDto>>.Ok(statuses.ToDto(zoneIdMap, vehicleIdMap), "Statuses retrieved successfully.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving statuses.");
                 return OperationResult<IEnumerable<StatusDto>>.Fail("An error occurred while retrieving statuses.", null, ex);
             }
         }
 
         public async Task<OperationResult<IEnumerable<PlanDto>>> GetPlanByZoneIdAsync(int zoneId)
         {
+            _logger.LogWarning("At Time {Time}, GetPlanByZoneIdAsync called", DateTime.UtcNow);
             try 
             {
                 var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
                 var plans = await _planRepo.GetQuery().Where(p => p.ZoneId == zoneId).ToListAsync();
                 if (plans == null || !plans.Any())
                 {
+                    _logger.LogWarning("No plans found for zone ID {ZoneId}.", zoneId);
                     return OperationResult<IEnumerable<PlanDto>>.Fail($"No plans found for zone ID {zoneId}.", null);
                 }
+                _logger.LogInformation("{Count} plans retrieved successfully for zone ID {ZoneId}.", plans.Count, zoneId);
                 return OperationResult<IEnumerable<PlanDto>>.Ok(plans.ToDto(zoneIdMap, vehicleIdMap), "Plans retrieved successfully.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving plans for zone ID {ZoneId}.", zoneId);
                 return OperationResult<IEnumerable<PlanDto>>.Fail($"An error occurred while retrieving plans for zone ID {zoneId}.", null, ex);
             }
         }
 
         public async Task<OperationResult<StatusDto>> GetStatusByIdAsync(int statusId)
         {
+            _logger.LogWarning("At Time {Time}, GetStatusByIdAsync called", DateTime.UtcNow);
             try
             {
                 var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
                 var statusCache = await _cacheService.GetAsync<Status>(CreateCacheKeyForStatus(statusId));
                 if (statusCache != null)
                 {
+                    _logger.LogInformation("Status retrieved from cache successfully");
                     return OperationResult<StatusDto>.Ok(statusCache.ToDto
                         (
                         zoneIdMap[statusCache.ZoneId],
@@ -368,10 +414,13 @@ namespace Evacuation.Application.Services
                 var status = await _statusRepo.GetByIdAsync(statusId);
                 if (status == null)
                 {
+                    _logger.LogWarning("Status with ID {StatusId} not found.", statusId);
                     return OperationResult<StatusDto>.Fail($"Status with ID {statusId} not found.", null);
                 }
                 // Update cache
                 await _cacheService.SetAsync(CreateCacheKeyForStatus(statusId), status);
+
+                _logger.LogInformation("Status with ID {StatusId} retrieved successfully from database.", statusId);
                 return OperationResult<StatusDto>.Ok
                     (status.ToDto
                     (
@@ -381,12 +430,14 @@ namespace Evacuation.Application.Services
             }
             catch (Exception ex) 
             {
+                _logger.LogError(ex, "An error occurred while retrieving status with ID {StatusId}.", statusId);
                 return OperationResult<StatusDto>.Fail($"An error occurred while retrieving status with ID {statusId}.", null, ex);
             }
         }
 
         public async Task<OperationResult<IEnumerable<StatusDto>>> UpdateStatusByPlanAsync()
         {
+            _logger.LogWarning("At Time {Time}, UpdateStatusByPlanAsync called", DateTime.UtcNow);
             try 
             {
                 var plans = await _planRepo.GetAllAsync();
@@ -395,6 +446,7 @@ namespace Evacuation.Application.Services
                     .ToDictionary(g => g.Key, g => g.ToList());
                 if (planGroups == null || !planGroups.Any())
                 {
+                    _logger.LogWarning("No plans found to update status.");
                     return OperationResult<IEnumerable<StatusDto>>.Fail("No plans found to update status.", null);
                 }
 
@@ -434,6 +486,7 @@ namespace Evacuation.Application.Services
                     var status = await CreateOrUpdateStatus(newStatus);
                     if (status == null)
                     {
+                        _logger.LogWarning("Failed to create or update status for zone ID {ZoneId}.", zoneId);
                         return OperationResult<IEnumerable<StatusDto>>.Fail($"Failed to create or update status for zone ID {zoneId}.", null);
                     }
                     var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
@@ -451,16 +504,19 @@ namespace Evacuation.Application.Services
 
                 if (statusList.Count == 0)
                 {
+                    _logger.LogWarning("No status updates were created.");
                     return OperationResult<IEnumerable<StatusDto>>.Fail("No status updates were created.", null);
                 }
                 // Update cache zone IDs
-                await _cacheService.SetAsync(RedisCacheKays.StatusHashKey, zoneIds);
+                await _cacheService.SetAsync(RedisCacheKeys.StatusHashKey, zoneIds);
 
+                _logger.LogInformation("{Count} statuses updated successfully by plan.", statusList.Count);
                 return OperationResult<IEnumerable<StatusDto>>.Ok(statusList, "Status updated successfully by plan.");
 
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while updating status by plan.");
                 return OperationResult<IEnumerable<StatusDto>>.Fail("An error occurred while updating status by plan.", null, ex);
             }
         }
