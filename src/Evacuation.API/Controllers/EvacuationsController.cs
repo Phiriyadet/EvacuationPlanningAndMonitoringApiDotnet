@@ -1,4 +1,5 @@
 ﻿using Evacuation.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -17,6 +18,7 @@ namespace Evacuation.API.Controllers
 
         // GET: api/evacuation/plan
         [HttpGet("plan")]
+        [Authorize]
         public async Task<IActionResult> GetAllPlans()
         {
             var result = await _evacuationService.GetAllPlansAsync();
@@ -36,6 +38,7 @@ namespace Evacuation.API.Controllers
 
         // GET: api/evacuation/status
         [HttpGet("status")]
+        [Authorize]
         public async Task<IActionResult> GetAllStatuses()
         {
             var result = await _evacuationService.GetAllStatusAsync();
@@ -55,6 +58,7 @@ namespace Evacuation.API.Controllers
 
         // GET api/<EvacuationController>/plan/5
         [HttpGet("plan/zoneId/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetPlanByIdAsync(int id)
         {
             var result = await _evacuationService.GetPlanByZoneIdAsync(id);
@@ -74,6 +78,7 @@ namespace Evacuation.API.Controllers
 
         // GET api/<EvacuationController>/status/5
         [HttpGet("status/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetStatusByIdAsync(int id)
         {
             var result = await _evacuationService.GetStatusByIdAsync(id);
@@ -93,6 +98,7 @@ namespace Evacuation.API.Controllers
 
         // POST api/<EvacuationController>
         [HttpPost("plan")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
         public async Task<IActionResult> PostPlan(double distanceKm=100)
         {
             var result = await _evacuationService.CreatePlanAsync(distanceKm);
@@ -112,6 +118,7 @@ namespace Evacuation.API.Controllers
 
         // PUT api/<EvacuationController>/5
         [HttpPut("update")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
         public async Task<IActionResult> UpdateStatus()
         {
             var result = await _evacuationService.UpdateStatusByPlanAsync();
@@ -131,6 +138,7 @@ namespace Evacuation.API.Controllers
 
         // DELETE api/<EvacuationController>/5
         [HttpDelete("clear")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
         public async Task<IActionResult> ClearEvacuations()
         {
             var result = await _evacuationService.ClearAllPlanAndStatusAsync();
