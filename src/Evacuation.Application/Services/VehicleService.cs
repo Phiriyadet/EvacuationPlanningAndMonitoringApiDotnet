@@ -43,11 +43,6 @@ namespace Evacuation.Application.Services
                 _logger.LogError(dbEx, "Database update error occurred while adding vehicle");
                 return OperationResult<VehicleDto>.Fail("Database update error occurred while adding the vehicle", null, dbEx);
             }
-            catch (ArgumentException argEx)
-            {
-                _logger.LogError(argEx, "Error generating vehicle ID");
-                return OperationResult<VehicleDto>.Fail($"Error generating vehicle ID: {argEx.Message}", null, argEx);
-            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while adding vehicle");

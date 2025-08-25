@@ -41,11 +41,6 @@ namespace Evacuation.Application.Services
                 _logger.LogError(dbEx, "Database update error occurred while adding zone");
                 return OperationResult<ZoneDto>.Fail("Database update error occurred while adding the zone", null, dbEx);
             }
-            catch (ArgumentException argEx)
-            {
-                _logger.LogError(argEx, "Error generating zone ID");
-                return OperationResult<ZoneDto>.Fail($"Error generating zone ID: {argEx.Message}", null, argEx);
-            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while adding zone");
