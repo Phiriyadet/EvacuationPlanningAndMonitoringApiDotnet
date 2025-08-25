@@ -1,6 +1,7 @@
 ﻿using Evacuation.Domain.Entities;
 using Evacuation.Infrastructure.Data.AppDbContext;
 using Evacuation.Infrastructure.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evacuation.Infrastructure.Repositories
 {
@@ -8,6 +9,11 @@ namespace Evacuation.Infrastructure.Repositories
     {
         public UserRepository(ApplicationDbContext context) : base(context)
         {
+        }
+
+        public async Task<User?> GetByUsernameAsync(string username)
+        {
+            return await _dbSet.FirstOrDefaultAsync(u => u.Username == username);   
         }
     }
 }

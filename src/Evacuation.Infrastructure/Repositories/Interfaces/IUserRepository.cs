@@ -4,5 +4,6 @@ namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
     public interface IUserRepository : IGenericRepository<User, int>
     {
+        Task<User?> GetByUsernameAsync(string username);
     }
 }
