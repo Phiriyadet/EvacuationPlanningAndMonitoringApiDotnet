@@ -56,3 +56,11 @@
 * Microsoft.EntityFrameworkCore.SqlServer
 * StackExchange.Redis;
 * Microsoft.IdentityModel.Tokens;
+
+
+## Commands
+### use in src/
+* add migrations
+`dotnet ef migrations add InitialCreate --output-dir Data/Migrations --project ./Evacuation.Infrastructure --startup-project ./Evacuation.API`
+* update database
+`dotnet ef database update --project ./Evacuation.Infrastructure --startup-project ./Evacuation.API`
