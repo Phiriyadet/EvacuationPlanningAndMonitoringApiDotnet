@@ -10,8 +10,8 @@ namespace Evacuation.Domain.Entities
         public string ETA { get; private set; } = string.Empty;
 
         //Navigation properties
-        //public Zone Zone { get; private set; } = null!;
-        //public Vehicle Vehicle { get; private set; } = null!;
+        public Zone Zone { get; private set; } = null!;
+        public Vehicle Vehicle { get; private set; } = null!;
 
         protected Plan() { }
 

@@ -14,8 +14,8 @@ namespace Evacuation.Domain.Entities
         public LocationCoordinates LocationCoordinates { get; private set; } = null!;
 
         //Navigation properties
-        //public Plan? Plan { get; private set; }
-        //public Status? Status { get; private set; }
+        public Plan? Plan { get; private set; }
+        public Status? Status { get; private set; }
 
         protected Vehicle() { }
 

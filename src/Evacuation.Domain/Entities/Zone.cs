@@ -11,8 +11,8 @@ namespace Evacuation.Domain.Entities
         public LocationCoordinates LocationCoordinates { get; private set; } = null!;
 
         //Navigation properties
-        //public Status? status { get; private set; }
-        //public ICollection<Plan> Plans { get; private set; } = new List<Plan>();
+        public Status? status { get; private set; }
+        public ICollection<Plan> Plans { get; private set; } = new List<Plan>();
 
         protected Zone() { }
 

@@ -11,8 +11,8 @@ namespace Evacuation.Domain.Entities
         public int LastVehicleIdUsed { get; private set; }
 
         //Navigation properties
-        //public Zone Zone { get; private set; } = null!;
-        //public Vehicle Vehicle { get; private set; } = null!;
+        public Zone Zone { get; private set; } = null!;
+        public Vehicle Vehicle { get; private set; } = null!;
 
         protected Status() { }
 
