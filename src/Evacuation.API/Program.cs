@@ -7,6 +7,7 @@ using Evacuation.Infrastructure.Data.AppDbContext;
 using Evacuation.Infrastructure.Repositories;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
@@ -15,6 +16,7 @@ using Serilog;
 using StackExchange.Redis;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -176,6 +178,31 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddRateLimiter(options =>
+{
+    // Global (default) policy
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: "global",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20, // ทุก API ได้ 20 req/10 sec
+                Window = TimeSpan.FromSeconds(10),
+                QueueLimit = 2,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+            }));
+
+    // Policy พิเศษสำหรับบาง endpoint
+    options.AddFixedWindowLimiter("strict", o =>
+    {
+        o.PermitLimit = 5;  // จำกัดแค่ 5 req/10 sec
+        o.Window = TimeSpan.FromSeconds(10);
+        o.QueueLimit = 1;
+        o.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+});
+
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -196,6 +223,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
