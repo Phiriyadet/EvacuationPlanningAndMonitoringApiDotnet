@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evacuation.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/zones")]
     [ApiController]
     [Authorize(Roles = "ADMIN,MANAGER")]
-    public class ZoneController : ControllerBase
+    public class ZonesController : ControllerBase
     {
         private readonly IZoneService _zoneService;
-        public ZoneController(IZoneService zoneService)
+        public ZonesController(IZoneService zoneService)
         {
             _zoneService = zoneService;
         }
@@ -68,10 +68,10 @@ namespace Evacuation.API.Controllers
                 }
                 else
                 {
-                    return BadRequest(new { Message = result.Message, Errors = result.Errors });
+                    return BadRequest(new { Message = result.Message });
                 }
             }
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Data!.ZoneId }, result.Data);
+            return Ok(result.Data);
         }
 
         // PUT api/<ZoneController>/5

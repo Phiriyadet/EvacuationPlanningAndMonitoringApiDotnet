@@ -1,12 +1,13 @@
 ﻿using Evacuation.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Evacuation.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/evacuations")]
     [ApiController]
     public class EvacuationsController : ControllerBase
     {
@@ -99,7 +100,8 @@ namespace Evacuation.API.Controllers
         // POST api/<EvacuationController>
         [HttpPost("plan")]
         [Authorize(Roles = "ADMIN,MANAGER")]
-        public async Task<IActionResult> PostPlan(double distanceKm=100)
+        [EnableRateLimiting("strict")]
+        public async Task<IActionResult> CreatePlan(double distanceKm=100)
         {
             var result = await _evacuationService.CreatePlanAsync(distanceKm);
             if (!result.IsSuccess)
@@ -119,6 +121,7 @@ namespace Evacuation.API.Controllers
         // PUT api/<EvacuationController>/5
         [HttpPut("update")]
         [Authorize(Roles = "ADMIN,MANAGER")]
+        [EnableRateLimiting("strict")]
         public async Task<IActionResult> UpdateStatus()
         {
             var result = await _evacuationService.UpdateStatusByPlanAsync();
@@ -139,6 +142,7 @@ namespace Evacuation.API.Controllers
         // DELETE api/<EvacuationController>/5
         [HttpDelete("clear")]
         [Authorize(Roles = "ADMIN,MANAGER")]
+        [EnableRateLimiting("strict")]
         public async Task<IActionResult> ClearEvacuations()
         {
             var result = await _evacuationService.ClearAllPlanAndStatusAsync();

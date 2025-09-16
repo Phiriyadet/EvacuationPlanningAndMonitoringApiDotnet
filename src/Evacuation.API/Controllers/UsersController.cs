@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evacuation.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
