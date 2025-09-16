@@ -17,6 +17,23 @@ namespace Evacuation.Application.Mappers
             };
         }
 
+        //public static PlanDto ToDto(this Plan plan)
+        //{
+        //    return new PlanDto
+        //    {
+        //        PlanId = plan.BusinessId,
+        //        ZoneId = plan.Zone.BusinessId,
+        //        VehicleId = plan.Vehicle.BusinessId,
+        //        NumberOfEvacuatedPeople = plan.NumberOfEvacuatedPeople,
+        //        ETA = plan.ETA
+        //    };
+        //}
+
+        //public static IEnumerable<PlanDto> ToDto(this IEnumerable<Plan> plans)
+        //{
+        //    return plans.Select(p => p.ToDto());
+        //}
+
         public static IEnumerable<PlanDto> ToDto(this IEnumerable<Plan> plans, 
             IDictionary<int, string> zoneIdMap, 
             IDictionary<int, string> vehicleIdMap)
