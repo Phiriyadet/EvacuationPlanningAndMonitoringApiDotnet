@@ -9,6 +9,10 @@ namespace Evacuation.Domain.Entities
         public int NumberOfEvacuatedPeople { get; private set; }
         public string ETA { get; private set; } = string.Empty;
 
+        //Navigation properties
+        //public Zone Zone { get; private set; } = null!;
+        //public Vehicle Vehicle { get; private set; } = null!;
+
         protected Plan() { }
 
         public Plan(int zoneId, int vehicleId, int numberOfEvacuatedPeople, string eta)

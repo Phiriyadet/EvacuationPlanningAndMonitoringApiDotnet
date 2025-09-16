@@ -10,6 +10,10 @@ namespace Evacuation.Domain.Entities
         public int RemainingPeople { get; private set; }
         public int LastVehicleIdUsed { get; private set; }
 
+        //Navigation properties
+        //public Zone Zone { get; private set; } = null!;
+        //public Vehicle Vehicle { get; private set; } = null!;
+
         protected Status() { }
 
         public Status(int zoneId, int totalEvacuatedPeople, int remainingPeople, int lastVehicleIdUsed)

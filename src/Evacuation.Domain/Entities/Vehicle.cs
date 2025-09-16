@@ -13,6 +13,10 @@ namespace Evacuation.Domain.Entities
         public bool IsAvailable { get; private set; } = true;
         public LocationCoordinates LocationCoordinates { get; private set; } = null!;
 
+        //Navigation properties
+        //public Plan? Plan { get; private set; }
+        //public Status? Status { get; private set; }
+
         protected Vehicle() { }
 
         public Vehicle(VehicleType type, int capacity, int speed, bool isAvailable, LocationCoordinates locationCoordinates)
