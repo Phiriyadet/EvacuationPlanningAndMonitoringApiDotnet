@@ -1,6 +1,44 @@
+﻿networks:
+  evacnet:
+
 services:
   evacuation.api:
-    image: ${DOCKER_REGISTRY-}evacuationapi
+    image: ${DOCKER_REGISTRY-}evacuation-api
     build:
       context: .
       dockerfile: src/Evacuation.API/Dockerfile
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    depends_on:
+      - mssql
+      - redis
+    # ตั้งค่า Environment Variables ให้แอปพลิเคชัน .NET
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DatabaseConnection=Server=mssql,1433;Database=EvacuationDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      - ConnectionStrings__RedisConnection=redis:${REDIS_PORT}
+    networks: 
+      - evacnet
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "${SQL_PORT}:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks: 
+      - evacnet
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks: 
+      - evacnet
+
+volumes:
+  mssql_data:
