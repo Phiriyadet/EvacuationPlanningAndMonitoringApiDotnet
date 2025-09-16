@@ -11,12 +11,12 @@ namespace Evacuation.UnitTests.Controllers
     public class ZoneControllerTests
     {
         private readonly Mock<IZoneService> _mockService;
-        private readonly ZoneController _controller;
+        private readonly ZonesController _controller;
 
         public ZoneControllerTests()
         {
             _mockService = new Mock<IZoneService>();
-            _controller = new ZoneController(_mockService.Object);
+            _controller = new ZonesController(_mockService.Object);
         }
 
         #region GET api/zones
