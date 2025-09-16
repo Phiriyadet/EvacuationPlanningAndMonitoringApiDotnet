@@ -83,3 +83,7 @@ ScaffoldingReadMe.txt
 secrets.json
 appsettings.Development.json
 docker-compose.override.yml
+
+# EF Migrations (เฉพาะ local dev)
+**/Migrations/
+
