@@ -2,7 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    public interface IPlanRepository : IGenericWithPrefixRepository<Plan, int>
+    public interface IPlanRepository : IGenericIncludeRepository<Plan, int>
     {
     }
 }

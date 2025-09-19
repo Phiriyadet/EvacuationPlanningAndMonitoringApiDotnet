@@ -2,7 +2,7 @@
 
 namespace Evacuation.Infrastructure.Repositories.Interfaces
 {
-    public interface IStatusRepository : IGenericWithPrefixRepository<Status, int>
+    public interface IStatusRepository : IGenericIncludeRepository<Status, int>
     {
     }
 }
