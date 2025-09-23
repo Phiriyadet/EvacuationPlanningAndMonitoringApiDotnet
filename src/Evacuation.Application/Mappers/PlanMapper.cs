@@ -5,43 +5,21 @@ namespace Evacuation.Application.Mappers
 {
     public static class PlanMapper
     {
-        public static PlanDto ToDto(this Plan plan, string zoneId, string vehicleId)
+        public static PlanDto ToDto(this Plan plan)
         {
-            return new PlanDto
-            {
-                PlanId = plan.BusinessId,
-                ZoneId = zoneId,
-                VehicleId = vehicleId,
-                NumberOfEvacuatedPeople = plan.NumberOfEvacuatedPeople,
-                ETA = plan.ETA
-            };
+           return new PlanDto
+           {
+               PlanId = plan.BusinessId,
+               ZoneId = plan.Zone.BusinessId,
+               VehicleId = plan.Vehicle.BusinessId,
+               NumberOfEvacuatedPeople = plan.NumberOfEvacuatedPeople,
+               ETA = plan.ETA
+           };
         }
 
-        //public static PlanDto ToDto(this Plan plan)
-        //{
-        //    return new PlanDto
-        //    {
-        //        PlanId = plan.BusinessId,
-        //        ZoneId = plan.Zone.BusinessId,
-        //        VehicleId = plan.Vehicle.BusinessId,
-        //        NumberOfEvacuatedPeople = plan.NumberOfEvacuatedPeople,
-        //        ETA = plan.ETA
-        //    };
-        //}
-
-        //public static IEnumerable<PlanDto> ToDto(this IEnumerable<Plan> plans)
-        //{
-        //    return plans.Select(p => p.ToDto());
-        //}
-
-        public static IEnumerable<PlanDto> ToDto(this IEnumerable<Plan> plans, 
-            IDictionary<int, string> zoneIdMap, 
-            IDictionary<int, string> vehicleIdMap)
+        public static IEnumerable<PlanDto> ToDto(this IEnumerable<Plan> plans)
         {
-            return plans.Select(p => p.ToDto(
-                zoneIdMap[p.ZoneId],
-                vehicleIdMap[p.VehicleId]
-                ));
+           return plans.Select(p => p.ToDto());
         }
 
         public static Plan CreateToEntity(this CreatePlanDto createDto)

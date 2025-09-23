@@ -5,26 +5,21 @@ namespace Evacuation.Application.Mappers
 {
     public static class StatusMapper
     {
-        public static StatusDto ToDto(this Status status, string zoneId, string lastVehicleUsedId)
+        public static StatusDto ToDto(this Status status)
         {
             return new StatusDto
-            {
+            { 
                 StatusId = status.BusinessId,
-                ZoneId = zoneId,
+                ZoneId = status.Zone.BusinessId,
                 TotalEvacuatedPeople = status.TotalEvacuatedPeople,
                 RemainingPeople = status.RemainingPeople,
-                LastVehicleUsedId = lastVehicleUsedId
+                LastVehicleUsedId = status.Vehicle.BusinessId
             };
         }
 
-        public static IEnumerable<StatusDto> ToDto(this IEnumerable<Status> statuses,
-        IDictionary<int, string> zoneIdMap, 
-        IDictionary<int, string> vehicleIdMap)
+        public static IEnumerable<StatusDto> ToDto(this IEnumerable<Status> statuses)
         {
-            return statuses.Select(s => s.ToDto(
-                zoneIdMap[s.ZoneId],
-                vehicleIdMap[s.LastVehicleIdUsed]
-            ));
+            return statuses.Select(s => s.ToDto());
         }
 
         public static Status CreateToEntity(this CreateStatusDto createDto)
