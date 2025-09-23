@@ -15,7 +15,7 @@ namespace Evacuation.Infrastructure.Repositories
         {
         }
 
-        public async Task<IEnumerable<T>> GetAllWithInclude(params Expression<Func<T, object>>[] includes)
+        public async Task<IEnumerable<T>> GetAllWithIncludeAsync(params Expression<Func<T, object>>[] includes)
         {
             var query = GetQuery();
 
@@ -27,7 +27,7 @@ namespace Evacuation.Infrastructure.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<T?> GetByIdWithInclude(TKey key, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdWithIncludeAsync(TKey key, params Expression<Func<T, object>>[] includes)
         {
             var query = GetQuery();
 
