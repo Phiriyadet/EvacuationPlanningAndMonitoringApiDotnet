@@ -166,13 +166,11 @@ namespace Evacuation.Application.Services
                         var newPlan = await CreateNewPlan(cretePlanDto);
                         if (newPlan == null)
                         {
-                            _logger.LogWarning("Failed to create a new plan for zone id {zoneId} with vehicle id {vehicleId}", zone.Id, vehicle.Id);
+                            _logger.LogWarning("Failed to create a new plan for zone id {ZoneId} with vehicle id {VehicleId}", zone.Id, vehicle.Id);
                             return OperationResult<IEnumerable<PlanDto>>.Fail("Failed to create a new plan.", null);
                         }
-                        var zondId = zone.BusinessId;
-                        var vehicleId = vehicle.BusinessId;
 
-                        planList.Add(newPlan.ToDto(zondId, vehicleId));
+                        planList.Add(newPlan.ToDto());
                     }
                 } // End of zone loop
                 if (planList.Count == 0)
@@ -264,31 +262,16 @@ namespace Evacuation.Application.Services
 
         }
 
-        private async Task<(Dictionary<int, string> ZoneMap, Dictionary<int, string> VehicleMap)> GetZoneAndVehicleMapsAsync()
-        {
-            var zoneTask = await _zoneRepo.GetIdMapAsync();
-            var vehicleTask = await _vehicleRepo.GetIdMapAsync();
-
-         
-            return (zoneTask, vehicleTask);
-        }
-
-
         public async Task<OperationResult<IEnumerable<PlanDto>>> GetAllPlansAsync()
         {
             _logger.LogWarning("At Time {Time}, GetAllPlansAsync called", DateTime.UtcNow);
             try 
             {
-                var plans = await _planRepo.GetAllAsync();
-                var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
-                if (zoneIdMap == null || vehicleIdMap == null)
-                {
-                    _logger.LogWarning("Zone or Vehicle ID map not found.");
-                    return OperationResult<IEnumerable<PlanDto>>.Fail("Zone or Vehicle ID map not found.", null);
-                }
+                var plans = await _planRepo.GetAllWithIncludeAsync(p => p.Zone, p => p.Vehicle);
+                
 
-                var planDtos = plans.ToDto(zoneIdMap, vehicleIdMap);
-                //var planDtos = plans.ToDto();
+                var planDtos = plans.ToDto();
+
                 if (plans == null || !plans.Any())
                 {
                     _logger.LogWarning("No plans found.");
@@ -310,8 +293,6 @@ namespace Evacuation.Application.Services
             _logger.LogWarning("At Time {Time}, GetAllStatusAsync called", DateTime.UtcNow);
             try
             {
-                var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
-
                 _logger.LogInformation("Get Statuses Key from cache if available.");
                 var statusCacheKeys = await _cacheService.GetAsync<HashSet<int>>(RedisCacheKeys.StatusHashKey);
                 if (statusCacheKeys != null && statusCacheKeys.Any())
@@ -323,17 +304,11 @@ namespace Evacuation.Application.Services
                         var cachedStatus = await _cacheService.GetAsync<Status>(CreateCacheKeyForStatus(cacheKey));
                         if (cachedStatus != null)
                         {
-
-                            statusList.Add(cachedStatus.ToDto
-                                (
-                                zoneIdMap[cachedStatus.ZoneId], 
-                                vehicleIdMap[cachedStatus.LastVehicleIdUsed]
-                                ));
+                            statusList.Add(cachedStatus.ToDto());
                         }
                         else
                         {
                             _logger.LogWarning("No status found for cache key {CacheKey}", cacheKey);
-
                         }
                     }
 
@@ -352,8 +327,6 @@ namespace Evacuation.Application.Services
                     // If no cache keys, retrieve from repository
                     var zoneIds = statuses.Select(s => s.ZoneId).ToHashSet();
                     await _cacheService.SetAsync(RedisCacheKeys.StatusHashKey, zoneIds);
-                    _logger.LogInformation("Saved status zone IDs to cache.");
-
                     // Update cache with all statuses
                     foreach (var status in statuses)
                     {
@@ -362,7 +335,7 @@ namespace Evacuation.Application.Services
                     }
                     _logger.LogInformation("Saved {Count} statuses to cache.", statuses.Count());
                     _logger.LogInformation("{Count} statuses retrieved successfully.", statuses.Count());
-                    return OperationResult<IEnumerable<StatusDto>>.Ok(statuses.ToDto(zoneIdMap, vehicleIdMap), "Statuses retrieved successfully.");
+                    return OperationResult<IEnumerable<StatusDto>>.Ok(statuses.ToDto(), "Statuses retrieved successfully.");
                 }
             }
             catch (Exception ex)
@@ -377,7 +350,6 @@ namespace Evacuation.Application.Services
             _logger.LogWarning("At Time {Time}, GetPlanByZoneIdAsync called", DateTime.UtcNow);
             try 
             {
-                var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
                 var plans = await _planRepo.GetQuery().Where(p => p.ZoneId == zoneId).ToListAsync();
                 if (plans == null || !plans.Any())
                 {
@@ -385,7 +357,7 @@ namespace Evacuation.Application.Services
                     return OperationResult<IEnumerable<PlanDto>>.Fail($"No plans found for zone ID {zoneId}.", null);
                 }
                 _logger.LogInformation("{Count} plans retrieved successfully for zone ID {ZoneId}.", plans.Count, zoneId);
-                return OperationResult<IEnumerable<PlanDto>>.Ok(plans.ToDto(zoneIdMap, vehicleIdMap), "Plans retrieved successfully.");
+                return OperationResult<IEnumerable<PlanDto>>.Ok(plans.ToDto(), "Plans retrieved successfully.");
             }
             catch (Exception ex)
             {
@@ -399,16 +371,11 @@ namespace Evacuation.Application.Services
             _logger.LogWarning("At Time {Time}, GetStatusByIdAsync called", DateTime.UtcNow);
             try
             {
-                var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
                 var statusCache = await _cacheService.GetAsync<Status>(CreateCacheKeyForStatus(statusId));
                 if (statusCache != null)
                 {
                     _logger.LogInformation("Status retrieved from cache successfully");
-                    return OperationResult<StatusDto>.Ok(statusCache.ToDto
-                        (
-                        zoneIdMap[statusCache.ZoneId],
-                        vehicleIdMap[statusCache.LastVehicleIdUsed]
-                        ), "Status retrieved from cache successfully.");
+                    return OperationResult<StatusDto>.Ok(statusCache.ToDto(), "Status retrieved from cache successfully.");
                 }
 
                 var status = await _statusRepo.GetByIdAsync(statusId);
@@ -422,11 +389,7 @@ namespace Evacuation.Application.Services
 
                 _logger.LogInformation("Status with ID {StatusId} retrieved successfully from database.", statusId);
                 return OperationResult<StatusDto>.Ok
-                    (status.ToDto
-                    (
-                        zoneIdMap[status.ZoneId],
-                        vehicleIdMap[status.LastVehicleIdUsed]
-                    ), "Status retrieved successfully.");
+                    (status.ToDto(), "Status retrieved successfully.");
             }
             catch (Exception ex) 
             {
@@ -489,13 +452,7 @@ namespace Evacuation.Application.Services
                         _logger.LogWarning("Failed to create or update status for zone ID {ZoneId}.", zoneId);
                         return OperationResult<IEnumerable<StatusDto>>.Fail($"Failed to create or update status for zone ID {zoneId}.", null);
                     }
-                    var (zoneIdMap, vehicleIdMap) = await GetZoneAndVehicleMapsAsync();
-                    
-                    statusList.Add(status.ToDto
-                        (
-                            zoneIdMap[status.ZoneId],
-                            vehicleIdMap[status.LastVehicleIdUsed]
-                        ));
+                    statusList.Add(status.ToDto());
 
                     var cacheKey = CreateCacheKeyForStatus(zoneId);
                     // Update cache
@@ -535,7 +492,7 @@ namespace Evacuation.Application.Services
                     (
                         status.TotalEvacuatedPeople,
                         status.RemainingPeople,
-                        status.LastVehicleIdUsed
+                        status.LastVehicleUsedId
                     );
                 
                 var result = await _statusRepo.UpdateAsync(existingStatus.ZoneId, existingStatus);
