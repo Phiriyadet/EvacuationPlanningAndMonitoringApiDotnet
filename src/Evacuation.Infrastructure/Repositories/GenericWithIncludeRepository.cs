@@ -38,11 +38,5 @@ namespace Evacuation.Infrastructure.Repositories
 
             return await query.FirstOrDefaultAsync(q => q.Id.Equals(key));
         }
-
-        public Task<Dictionary<TKey, string>> GetIdMapAsync()
-        {
-            return _dbSet.AsNoTracking()
-            .ToDictionaryAsync(e => (TKey)(object)e.Id, e => e.BusinessId);
-        }
     }
 }

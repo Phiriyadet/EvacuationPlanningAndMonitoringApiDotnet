@@ -7,7 +7,6 @@ namespace Evacuation.Infrastructure.Repositories.Interfaces
             where T : BaseEntityWithPrefix
             where TKey : notnull
     {
-        Task<Dictionary<TKey, string>> GetIdMapAsync();
         /// <summary>
         /// ดึงข้อมูลทั้งหมดของ Entity <typeparamref name="T"/> 
         /// พร้อมกับ Navigation Properties ที่ต้องการ include
