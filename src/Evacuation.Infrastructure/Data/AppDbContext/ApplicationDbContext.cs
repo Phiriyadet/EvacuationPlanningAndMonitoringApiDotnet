@@ -50,7 +50,7 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
 
             // Configure properties if necessary
             modelBuilder.Entity<Vehicle>()
-                .OwnsOne(v => v.LocationCoordinates, lc => 
+                .OwnsOne(v => v.LocationCoordinates, lc =>
                 {
                     lc.Property(l => l.Latitude).HasColumnName("Latitude");
                     lc.Property(l => l.Longitude).HasColumnName("Longitude");
@@ -64,28 +64,34 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
 
             // Configure relationships if necessary
             modelBuilder.Entity<Plan>()
-                .HasOne<Vehicle>()
-                .WithOne()
+                .HasOne(p => p.Vehicle)
+                .WithOne(v => v.Plan)
                 .HasForeignKey<Plan>(p => p.VehicleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Plan>()
-                .HasOne<Zone>()
-                .WithMany()
+                .HasOne(p => p.Zone)
+                .WithMany(z => z.Plans)
                 .HasForeignKey(p => p.ZoneId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Status>()
-                .HasOne<Zone>()
-                .WithOne()
+                .HasOne(s => s.Zone)
+                .WithOne(z => z.Status)
                 .HasForeignKey<Status>(s => s.ZoneId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Status>()
+                .HasOne(s => s.Vehicle)
+                .WithOne(v=> v.Status)
+                .HasForeignKey<Status>(s => s.LastVehicleUsedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Indexes for faster queries
             modelBuilder.Entity<Plan>().HasIndex(p => p.VehicleId).IsUnique();
             modelBuilder.Entity<Plan>().HasIndex(p => p.ZoneId);
 
-            
+
         }
 
 
