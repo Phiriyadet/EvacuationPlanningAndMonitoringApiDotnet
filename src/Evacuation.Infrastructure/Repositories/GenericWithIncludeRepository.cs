@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Evacuation.Domain.Entities;
-using Evacuation.Infrastructure.Data.AppDbContext;
+using Evacuation.Domain.Enums;
+using Evacuation.Infrastructure.Config.Interfaces;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ namespace Evacuation.Infrastructure.Repositories
             where T : BaseEntityWithPrefix
             where TKey : notnull
     {
-        public GenericWithIncludeRepository(ApplicationDbContext context) : base(context)
+        public GenericWithIncludeRepository(IDbContextFactory factory, DatabaseType database) : base(factory, database)
         {
         }
 

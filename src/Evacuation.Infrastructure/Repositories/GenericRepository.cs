@@ -1,5 +1,6 @@
 ﻿using Evacuation.Domain.Entities;
-using Evacuation.Infrastructure.Data.AppDbContext;
+using Evacuation.Domain.Enums;
+using Evacuation.Infrastructure.Config.Interfaces;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,13 +10,13 @@ namespace Evacuation.Infrastructure.Repositories
             where T : BaseEntity
             where TKey : notnull
     {
-        protected readonly ApplicationDbContext _context;
+        protected readonly DbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public GenericRepository(ApplicationDbContext context)
+        public GenericRepository(IDbContextFactory factory, DatabaseType database)
         {
-            _context = context;
-            _dbSet = context.Set<T>();
+            _context = factory.GetDbContext(database);
+            _dbSet = _context.Set<T>();
 
         }
 
