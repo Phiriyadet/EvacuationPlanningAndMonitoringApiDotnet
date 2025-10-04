@@ -1,12 +1,12 @@
-﻿using Evacuation.Domain.Entities;
+using Evacuation.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evacuation.Infrastructure.Data.AppDbContext
 {
-    public class ApplicationDbContext : DbContext
+
+    public class PostgresDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options)
         {
         }
         // DbSet properties for your entities
@@ -83,7 +83,7 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
 
             modelBuilder.Entity<Status>()
                 .HasOne(s => s.Vehicle)
-                .WithOne(v=> v.Status)
+                .WithOne(v => v.Status)
                 .HasForeignKey<Status>(s => s.LastVehicleUsedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -91,9 +91,6 @@ namespace Evacuation.Infrastructure.Data.AppDbContext
             modelBuilder.Entity<Plan>().HasIndex(p => p.VehicleId).IsUnique();
             modelBuilder.Entity<Plan>().HasIndex(p => p.ZoneId);
 
-
         }
-
-
     }
 }
