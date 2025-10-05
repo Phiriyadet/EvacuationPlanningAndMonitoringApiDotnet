@@ -63,7 +63,7 @@ namespace Evacuation.Application.Services
                     return OperationResult<bool>.Ok(true, $"Vehicle with ID {vehicleId} deleted successfully");
                 }
                 _logger.LogInformation("Vehicle with ID {VehicleId} not found", vehicleId);
-                return OperationResult<bool>.Fail("Vehicle not found", false);
+                return OperationResult<bool>.Fail($"Vehicle with ID {vehicleId} not found", false);
             }
             catch (Exception ex)
             {
