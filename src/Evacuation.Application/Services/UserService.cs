@@ -3,6 +3,7 @@ using Evacuation.Application.Mappers;
 using Evacuation.Application.Services.Interfaces;
 using Evacuation.Domain.Entities;
 using Evacuation.Domain.Enums;
+using Evacuation.Infrastructure.Repositories.Factory.Interfaces;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Evacuation.Shared.Result;
 using Evacuation.Shared.Validation;
@@ -16,15 +17,15 @@ using System.Text;
 
 namespace Evacuation.Application.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
         private readonly IConfiguration _config;
         private readonly IUserRepository _userRepo;
         private readonly ILogger<UserService> _logger;
-        public UserService(IConfiguration config, IUserRepository userRepo, ILogger<UserService> logger)
+        public UserService(IConfiguration config, IRepositoryFactory repoFactory, DatabaseType dbType, ILogger<UserService> logger) : base(repoFactory, dbType)
         {
             _config = config;
-            _userRepo = userRepo;
+            _userRepo = _repoFactory.CreateUserRepository(_dbType);
             _logger = logger;
         }
 

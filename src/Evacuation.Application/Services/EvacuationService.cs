@@ -3,18 +3,19 @@ using Evacuation.Application.DTOs.Status;
 using Evacuation.Application.Mappers;
 using Evacuation.Application.Services.Interfaces;
 using Evacuation.Domain.Entities;
+using Evacuation.Domain.Enums;
 using Evacuation.Infrastructure.Cache.Interfaces;
+using Evacuation.Infrastructure.Repositories.Factory.Interfaces;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Evacuation.Shared.CacheKeys;
 using Evacuation.Shared.Cal;
 using Evacuation.Shared.Result;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Numerics;
 
 namespace Evacuation.Application.Services
 {
-    public class EvacuationService : IEvacuationService
+    public class EvacuationService : BaseService, IEvacuationService
     {
         private readonly IPlanRepository _planRepo;
         private readonly IStatusRepository _statusRepo;
@@ -24,17 +25,14 @@ namespace Evacuation.Application.Services
         private readonly ILogger<EvacuationService> _logger;
 
         public EvacuationService(
-            IPlanRepository planRepo, 
-            IStatusRepository statusRepo,
-            IZoneRepository zoneRepo, 
-            IVehicleRepository vehicleRepo, 
+            IRepositoryFactory repoFactory, DatabaseType dbType, 
             ICacheService cacheService,
-            ILogger<EvacuationService> logger)
+            ILogger<EvacuationService> logger) : base(repoFactory, dbType)
         {
-            _planRepo = planRepo;
-            _statusRepo = statusRepo;
-            _zoneRepo = zoneRepo;
-            _vehicleRepo = vehicleRepo;
+            _planRepo = _repoFactory.CreatePlanRepository(_dbType);
+            _statusRepo = _repoFactory.CreateStatusRepository(_dbType);
+            _zoneRepo = _repoFactory.CreateZoneRepository(_dbType);
+            _vehicleRepo = _repoFactory.CreateVehicleRepository(_dbType);
             _cacheService = cacheService;
             _logger = logger;
         }

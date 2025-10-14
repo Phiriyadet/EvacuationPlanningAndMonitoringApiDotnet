@@ -1,6 +1,9 @@
 ﻿using Evacuation.Application.DTOs.Vehicle;
 using Evacuation.Application.Mappers;
 using Evacuation.Application.Services.Interfaces;
+using Evacuation.Domain.Enums;
+using Evacuation.Infrastructure.Repositories;
+using Evacuation.Infrastructure.Repositories.Factory.Interfaces;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Evacuation.Shared.Result;
 using Evacuation.Shared.Validation;
@@ -9,21 +12,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Evacuation.Application.Services
 {
-    public class VehicleService : IVehicleService
+    public class VehicleService : BaseService, IVehicleService
     {
-        private readonly IVehicleRepository _vehicleRepo;
         private readonly ILogger<VehicleService> _logger;
+        private readonly IVehicleRepository _vehicleRepo;
 
-        public VehicleService(IVehicleRepository vehicleRepo,ILogger<VehicleService> logger)
+        public VehicleService(IRepositoryFactory repoFactory, DatabaseType dbType, ILogger<VehicleService> logger)
+            : base(repoFactory, dbType)
         {
-            _vehicleRepo = vehicleRepo;
+            //ใช้ Factory สร้าง repo ครั้งเดียวตอนสร้าง service
+            _vehicleRepo = _repoFactory.CreateVehicleRepository(_dbType);
             _logger = logger;
         }
+
 
         public async Task<OperationResult<VehicleDto>> AddVehicleAsync(CreateVehicleDto createDto)
         {
             _logger.LogInformation("At Time {Time}, AddVehicleAsync called", DateTime.UtcNow);
-            try 
+            try
             {
                 var errors = ValidationHelper.ValidateObject(createDto);
                 if (errors.Any())
@@ -54,7 +60,7 @@ namespace Evacuation.Application.Services
         public async Task<OperationResult<bool>> DeleteVehicleAsync(int vehicleId)
         {
             _logger.LogInformation("At Time {Time}, DeleteVehicleAsync called for Vehicle ID {VehicleId}", DateTime.UtcNow, vehicleId);
-            try 
+            try
             {
                 var deleted = await _vehicleRepo.DeleteAsync(vehicleId);
                 if (deleted)
@@ -75,7 +81,7 @@ namespace Evacuation.Application.Services
         public async Task<OperationResult<IEnumerable<VehicleDto>>> GetAllVehiclesAsync()
         {
             _logger.LogInformation("At Time {Time}, GetAllVehiclesAsync called", DateTime.UtcNow);
-            try 
+            try
             {
                 var vehicles = await _vehicleRepo.GetAllAsync();
                 if (vehicles == null || !vehicles.Any())
@@ -97,7 +103,7 @@ namespace Evacuation.Application.Services
         public async Task<OperationResult<VehicleDto>> GetVehicleByIdAsync(int vehicleId)
         {
             _logger.LogInformation("At Time {Time}, GetVehicleByIdAsync called for Vehicle ID {VehicleId}", DateTime.UtcNow, vehicleId);
-            try 
+            try
             {
                 var vehicle = await _vehicleRepo.GetByIdAsync(vehicleId);
                 if (vehicle == null)
@@ -119,7 +125,7 @@ namespace Evacuation.Application.Services
         public async Task<OperationResult<VehicleDto>> UpdateVehicleAsync(int Id, UpdateVehicleDto updateDto)
         {
             _logger.LogInformation("At Time {Time}, UpdateVehicleAsync called for Vehicle ID {VehicleId}", DateTime.UtcNow, Id);
-            try 
+            try
             {
                 var errors = ValidationHelper.ValidateObject(updateDto);
                 if (errors.Any())

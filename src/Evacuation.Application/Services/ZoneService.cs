@@ -1,6 +1,8 @@
 ﻿using Evacuation.Application.DTOs.Zone;
 using Evacuation.Application.Mappers;
 using Evacuation.Application.Services.Interfaces;
+using Evacuation.Domain.Enums;
+using Evacuation.Infrastructure.Repositories.Factory.Interfaces;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Evacuation.Shared.Result;
 using Evacuation.Shared.Validation;
@@ -9,13 +11,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Evacuation.Application.Services
 {
-    public class ZoneService : IZoneService
+    public class ZoneService : BaseService, IZoneService
     {
         private readonly IZoneRepository _zoneRepo;
         private readonly ILogger<ZoneService> _logger;
-        public ZoneService(IZoneRepository zoneRepo, ILogger<ZoneService> logger)
+        public ZoneService(IRepositoryFactory repoFactory, DatabaseType dbType, ILogger<ZoneService> logger) : base(repoFactory, dbType)
         {
-            _zoneRepo = zoneRepo;
+            _zoneRepo = _repoFactory.CreateZoneRepository(_dbType);
             _logger = logger;
         }
         public async Task<OperationResult<ZoneDto>> AddZoneAsync(CreateZoneDto createDto)
