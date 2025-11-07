@@ -2,7 +2,6 @@
 using Evacuation.Application.Mappers;
 using Evacuation.Application.Services.Interfaces;
 using Evacuation.Domain.Enums;
-using Evacuation.Infrastructure.Repositories;
 using Evacuation.Infrastructure.Repositories.Factory.Interfaces;
 using Evacuation.Infrastructure.Repositories.Interfaces;
 using Evacuation.Shared.Result;
