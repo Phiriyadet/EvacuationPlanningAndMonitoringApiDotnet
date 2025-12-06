@@ -1,9 +1,10 @@
-﻿networks:
+﻿version: '3.9'
+
+networks:
   evacnet:
 
 services:
   evacuation.api:
-    image: ${DOCKER_REGISTRY-}evacuation-api
     build:
       context: .
       dockerfile: src/Evacuation.API/Dockerfile
@@ -12,33 +13,48 @@ services:
       - "5001:8081"
     depends_on:
       - mssql
+      - postgres
       - redis
-    # ตั้งค่า Environment Variables ให้แอปพลิเคชัน .NET
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DatabaseConnection=Server=mssql,1433;Database=EvacuationDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
-      - ConnectionStrings__RedisConnection=redis:${REDIS_PORT}
-    networks: 
+      - ConnectionStrings__MssqlConnection=Server=mssql,1433;Database=EvacuationDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      - ConnectionStrings__PostgresConnection=Host=postgres;Port=5432;Database=EvacuationDb;Username=postgres;Password=${PG_PASSWORD}
+      - ConnectionStrings__RedisConnection=redis:6379
+    networks:
       - evacnet
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-      - "${SQL_PORT}:1433"
+      - "${MSSQL_PORT:-11433}:1433"
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${MSSQL_SA_PASSWORD}
     volumes:
       - mssql_data:/var/opt/mssql
-    networks: 
+    networks:
+      - evacnet
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "${PG_PORT:-15432}:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DB=EvacuationDb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
       - evacnet
 
   redis:
     image: redis:6-alpine
     ports:
-      - "${REDIS_PORT}:6379"
-    networks: 
+      - "${REDIS_PORT:-16379}:6379"
+    networks:
       - evacnet
 
 volumes:
   mssql_data:
+  pg_data:
