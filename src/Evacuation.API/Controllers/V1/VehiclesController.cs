@@ -1,9 +1,7 @@
 ﻿using Evacuation.Application.DTOs.Vehicle;
-using Evacuation.Application.Services;
 using Evacuation.Application.Services.Factory.Interfaces;
 using Evacuation.Application.Services.Interfaces;
 using Evacuation.Domain.Enums;
-using Evacuation.Infrastructure.Config.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evacuation.API.Controllers.V1
 {
-    [Route("api/v1/vehicles")]
+    [ApiVersion("1")]
+    [Route("api/v{version:apiVersion}/vehicles")]
     [ApiController]
     [Authorize(Roles = "ADMIN,MANAGER")]
     public class VehiclesController : ControllerBase

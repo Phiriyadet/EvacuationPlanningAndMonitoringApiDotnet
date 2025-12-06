@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evacuation.API.Controllers.V2
 {
-    [Route("api/v2/vehicles")]
+    [ApiVersion("2")]
+    [Route("api/v{version:apiVersion}/vehicles")]
     [ApiController]
     [Authorize(Roles = "ADMIN,MANAGER")]
     public class VehiclesController : ControllerBase
